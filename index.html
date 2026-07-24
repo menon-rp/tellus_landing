@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tellus Cryo — Conversational Satellite Analytics for Cryosphere Research</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ice: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans antialiased selection:bg-ice-500 selection:text-white">
+
+    <!-- Header Navigation -->
+    <nav class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <span class="text-2xl">❄️</span>
+                <span class="text-xl font-bold tracking-tight bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">Tellus Cryo</span>
+            </div>
+            <div class="flex items-center space-x-6 text-sm text-slate-400">
+                <a href="#features" class="hover:text-cyan-400 transition">Features</a>
+                <a href="#how-it-works" class="hover:text-cyan-400 transition">Architecture</a>
+                <a href="#early-access" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-medium px-4 py-2 rounded-lg text-sm transition">Get Early Access</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="max-w-5xl mx-auto px-6 pt-20 pb-16 text-center">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-cyan-500/30 bg-cyan-500/10 text-cyan-300 text-xs font-semibold uppercase tracking-wider mb-8">
+            <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+            NASA ICESat-2 (ATL20) AI Assistant
+        </div>
+        
+        <h1 class="text-4xl md:text-6xl font-extrabold text-white tracking-tight leading-tight mb-6">
+            Conversational Satellite Analytics for <span class="bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-500 bg-clip-text text-transparent">Polar Climate Science</span>
+        </h1>
+        
+        <p class="text-lg md:text-xl text-slate-400 max-w-3xl mx-auto mb-10 leading-relaxed">
+            Stop wrestling with complex HDF5 files and projection grids. Query NASA ICESat-2 sea ice freeboard data using natural language—instantly generating spatial maps, time-series trends, and AI domain commentary.
+        </p>
+
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+            <a href="#early-access" class="w-full sm:w-auto px-8 py-3.5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-xl shadow-lg shadow-cyan-500/20 transition">
+                Request Researcher Preview
+            </a>
+            <a href="https://github.com" target="_blank" class="w-full sm:w-auto px-8 py-3.5 bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 font-semibold rounded-xl transition flex items-center justify-center gap-2">
+                <i class="fab fa-github"></i> View Architecture
+            </a>
+        </div>
+
+        <!-- Simulated App Preview Box -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-2xl text-left max-w-4xl mx-auto">
+            <!-- Simulated Input Bar -->
+            <div class="flex items-center gap-3 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 mb-6">
+                <i class="fas fa-terminal text-cyan-400"></i>
+                <span class="text-slate-300 text-sm font-mono flex-1">"Show me the 2020-2024 sea ice freeboard anomaly in the Weddell Sea."</span>
+                <span class="bg-cyan-500/20 text-cyan-300 text-xs px-2.5 py-1 rounded-md font-mono">Qwen 2.5 Parsed</span>
+            </div>
+
+            <!-- Simulated Results Area -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Data Metrics Panel -->
+                <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800/80 text-sm space-y-3">
+                    <h4 class="text-slate-400 text-xs uppercase font-bold tracking-wider">Computed Metrics</h4>
+                    <div class="flex justify-between"><span class="text-slate-400">Mean Freeboard:</span> <span class="font-mono text-cyan-300">0.284 m</span></div>
+                    <div class="flex justify-between"><span class="text-slate-400">Max Peak:</span> <span class="font-mono text-cyan-300">1.120 m</span></div>
+                    <div class="flex justify-between"><span class="text-slate-400">Std Deviation:</span> <span class="font-mono text-cyan-300">0.089 m</span></div>
+                    <div class="pt-2 border-t border-slate-800 text-xs text-slate-400">
+                        Projection: <span class="text-slate-200">Antarctic Polar Stereographic (EPSG:3031)</span>
+                    </div>
+                </div>
+
+                <!-- AI Commentary Mock -->
+                <div class="md:col-span-2 bg-slate-950/60 p-4 rounded-xl border border-slate-800/80 text-sm">
+                    <h4 class="text-cyan-400 text-xs uppercase font-bold tracking-wider mb-2 flex items-center gap-2">
+                        <i class="fas fa-brain"></i> Cryosphere AI Commentary
+                    </h4>
+                    <ul class="text-slate-300 text-xs space-y-2 list-disc list-inside">
+                        <li>Freeboard distribution shows a <strong>+0.04m positive anomaly</strong> along the western Weddell Sea edge.</li>
+                        <li>Indicates potential multi-year ice accumulation driven by strong atmospheric ridge positioning.</li>
+                        <li>Values align with satellite altimetry baseline trends from NASA ICESat-2 ATL20 granules.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 border-t border-slate-900 bg-slate-950/50">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-white mb-4">Built for Serious Geospatial Workflows</h2>
+                <p class="text-slate-400 max-w-2xl mx-auto">Tellus Cryo replaces hours of data preprocessing script writing with direct, verified satellite analytics.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="bg-slate-900/60 border border-slate-800 p-6 rounded-2xl hover:border-cyan-500/40 transition">
+                    <div class="w-12 h-12 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center text-xl mb-4">
+                        <i class="fas fa-satellite"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Direct NASA Integration</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">Pulls verified ICESat-2 (ATL20) grid granules directly using NASA Earthdata authentication with disk-cached performance.</p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="bg-slate-900/60 border border-slate-800 p-6 rounded-2xl hover:border-cyan-500/40 transition">
+                    <div class="w-12 h-12 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center text-xl mb-4">
+                        <i class="fas fa-globe-americas"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Polar Stereographic Projections</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">Native Cartopy rendering for EPSG:3031 (Antarctic) and EPSG:3413 (Arctic) projections without longitude distortion.</p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="bg-slate-900/60 border border-slate-800 p-6 rounded-2xl hover:border-cyan-500/40 transition">
+                    <div class="w-12 h-12 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center text-xl mb-4">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Deterministic AI Parser</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">Natural language parameters are extracted deterministically via Qwen 2.5—ensuring math and maps come purely from raw data.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Early Access Form -->
+    <section id="early-access" class="py-20 border-t border-slate-900">
+        <div class="max-w-3xl mx-auto px-6 text-center">
+            <h2 class="text-3xl font-bold text-white mb-4">Join the August Pre-Launch Preview</h2>
+            <p class="text-slate-400 mb-8">Are you a cryosphere researcher, PhD candidate, or GIS analyst? Get early access to test the live prototype before the public September 12 release.</p>
+
+            <form class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto" onsubmit="event.preventDefault(); alert('Thank you! You are on the early access preview list.');">
+                <input type="email" required placeholder="Enter your academic / lab email" class="bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-slate-200 text-sm focus:outline-none focus:border-cyan-500 flex-1">
+                <button type="submit" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-6 py-3 rounded-xl text-sm transition">
+                    Request Preview
+                </button>
+            </form>
+            <p class="text-xs text-slate-500 mt-3">Zero spam. Purely for research feedback and preview links.</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-900 py-8 text-center text-xs text-slate-500">
+        <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div>
+                © 2026 Tellus Cryo • Built with Python, Xarray, Cartopy & Qwen 2.5
+            </div>
+            <div>
+                Powered by NASA Earthdata (ATL20 Granules)
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
