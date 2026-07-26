@@ -1,259 +1,629 @@
-<!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<!doctype html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tellus Polaris — Conversational Satellite Analytics for Cryosphere Research</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        neutral: {
-                            850: '#121212',
-                            950: '#0a0a0a',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Custom Splash Screen Animation -->
-    <style>
-        @keyframes zoomIntro {
-            0% {
-                transform: scale(0.8);
-                opacity: 0;
-                filter: blur(12px);
-            }
-            45% {
-                transform: scale(1);
-                opacity: 1;
-                filter: blur(0px);
-            }
-            75% {
-                transform: scale(1.08);
-                opacity: 1;
-                filter: blur(0px);
-            }
-            100% {
-                transform: scale(1.3);
-                opacity: 0;
-                filter: blur(10px);
-            }
-        }
-        .animate-zoom-intro {
-            animation: zoomIntro 2.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Polaris by Tellus is an AI workspace for polar Earth observation, beginning with NASA ICESat-2 sea-ice freeboard data.">
+  <meta name="theme-color" content="#070a10">
+  <title>Polaris by Tellus — AI workspace for polar Earth observation</title>
+  <style>
+    :root {
+      --ink: #070a10;
+      --panel: rgba(16, 21, 31, .72);
+      --panel-strong: #101724;
+      --line: rgba(213, 227, 255, .12);
+      --text: #f5f8ff;
+      --muted: #9aa7ba;
+      --quiet: #657287;
+      --ice: #bde6ff;
+      --blue: #78a7ff;
+      --violet: #b6a2ff;
+      --success: #9ff1c7;
+      --danger: #ff9da8;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    body {
+      min-width: 320px;
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(900px 530px at 76% -8%, rgba(75, 121, 205, .26), transparent 68%),
+        radial-gradient(730px 520px at 6% 30%, rgba(102, 67, 177, .16), transparent 70%),
+        var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+
+    .grid-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      opacity: .34;
+      background-image:
+        linear-gradient(rgba(196, 219, 255, .035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(196, 219, 255, .035) 1px, transparent 1px);
+      background-size: 54px 54px;
+      mask-image: linear-gradient(to bottom, black, transparent 83%);
+    }
+
+    .container { width: min(1160px, calc(100% - 40px)); margin: 0 auto; }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 7px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: #c8d4e8;
+      background: rgba(22, 29, 42, .62);
+      font-size: 12px;
+      font-weight: 650;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .pulse {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--ice);
+      box-shadow: 0 0 0 0 rgba(189, 230, 255, .55);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      70% { box-shadow: 0 0 0 7px rgba(189, 230, 255, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(189, 230, 255, 0); }
+    }
+
+    /* Splash */
+    #splash {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: grid;
+      place-items: center;
+      background: #070a10;
+      transition: opacity .6s ease, visibility .6s ease;
+    }
+    #splash.is-hidden { opacity: 0; visibility: hidden; }
+    .splash-inner { text-align: center; animation: intro 1.65s cubic-bezier(.16, 1, .3, 1) both; }
+    .splash-tellus { margin: 0; color: #b7c4d9; font-size: 12px; font-weight: 750; letter-spacing: .46em; }
+    .splash-polaris {
+      margin: 12px 0 0;
+      font-size: clamp(54px, 12vw, 132px);
+      font-weight: 820;
+      letter-spacing: -.075em;
+      line-height: .8;
+      background: linear-gradient(135deg, #fff 8%, #c8dbf5 48%, #7788a7);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .splash-caption { margin: 19px 0 0; color: var(--quiet); font-size: 10px; font-weight: 700; letter-spacing: .26em; text-transform: uppercase; }
+    @keyframes intro {
+      0% { opacity: 0; transform: scale(.88); filter: blur(12px); }
+      38% { opacity: 1; transform: scale(1); filter: blur(0); }
+      78% { opacity: 1; transform: scale(1.04); filter: blur(0); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    /* Navigation */
+    .nav-wrap {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid rgba(213, 227, 255, .08);
+      background: rgba(7, 10, 16, .76);
+      backdrop-filter: blur(18px);
+    }
+    nav { min-height: 72px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .brand { display: inline-flex; align-items: center; gap: 11px; }
+    .brand-mark {
+      position: relative;
+      display: grid;
+      width: 29px;
+      height: 29px;
+      place-items: center;
+      border: 1px solid rgba(219, 236, 255, .25);
+      border-radius: 10px;
+      background: linear-gradient(145deg, rgba(208, 232, 255, .25), rgba(115, 132, 212, .08));
+      box-shadow: inset 0 1px rgba(255,255,255,.11);
+    }
+    .brand-mark::before, .brand-mark::after { content: ""; position: absolute; background: #dceeff; border-radius: 3px; }
+    .brand-mark::before { width: 13px; height: 2px; transform: rotate(45deg); }
+    .brand-mark::after { width: 2px; height: 13px; transform: rotate(45deg); }
+    .brand-name { display: flex; align-items: baseline; gap: 7px; line-height: 1; }
+    .brand-tellus { color: #d8e1f0; font-size: 11px; font-weight: 760; letter-spacing: .19em; }
+    .brand-polaris { color: white; font-size: 17px; font-weight: 760; letter-spacing: -.035em; }
+    .nav-links { display: flex; align-items: center; gap: 25px; color: var(--muted); font-size: 13px; font-weight: 550; }
+    .nav-links a:hover { color: white; }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      min-height: 46px;
+      padding: 0 18px;
+      border: 1px solid transparent;
+      border-radius: 11px;
+      font-size: 14px;
+      font-weight: 700;
+      transition: transform .2s ease, border-color .2s ease, background .2s ease, box-shadow .2s ease;
+    }
+    .button:hover { transform: translateY(-1px); }
+    .button-primary {
+      color: #07101a;
+      background: linear-gradient(135deg, #ecf7ff, #aecdf4);
+      box-shadow: 0 7px 24px rgba(119, 177, 239, .16);
+    }
+    .button-primary:hover { box-shadow: 0 11px 30px rgba(119, 177, 239, .26); }
+    .button-quiet { color: #dce8f9; border-color: var(--line); background: rgba(23, 29, 41, .56); }
+    .button-quiet:hover { border-color: rgba(213, 227, 255, .29); background: rgba(32, 41, 56, .78); }
+    .button-small { min-height: 38px; padding: 0 13px; border-radius: 9px; font-size: 12px; }
+
+    /* Hero */
+    .hero { padding: 104px 0 86px; text-align: center; }
+    .hero .eyebrow { margin-bottom: 25px; }
+    .product-lockup { margin: 0 0 21px; }
+    .product-lockup small { display: block; margin-bottom: 7px; color: #9cacbf; font-size: 11px; font-weight: 780; letter-spacing: .28em; text-transform: uppercase; }
+    .product-lockup strong {
+      display: block;
+      font-size: clamp(54px, 9vw, 104px);
+      font-weight: 830;
+      letter-spacing: -.082em;
+      line-height: .78;
+      background: linear-gradient(120deg, #fff, #dae7fb 48%, #a6b7d2);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .hero h1 {
+      max-width: 850px;
+      margin: 0 auto;
+      color: #f8fbff;
+      font-size: clamp(34px, 5vw, 62px);
+      font-weight: 740;
+      letter-spacing: -.055em;
+      line-height: 1.02;
+    }
+    .hero h1 em { font-style: normal; color: #b8dfff; }
+    .hero-copy { max-width: 685px; margin: 23px auto 0; color: var(--muted); font-size: 18px; line-height: 1.65; }
+    .hero-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
+    .availability { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 17px; color: var(--quiet); font-size: 12px; }
+    .availability span { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: #9fc6ff; }
+
+    /* App preview */
+    .app-shell {
+      position: relative;
+      max-width: 1040px;
+      margin: 74px auto 0;
+      padding: 1px;
+      overflow: hidden;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(196, 226, 255, .36), rgba(133, 119, 218, .08) 45%, rgba(196, 226, 255, .1));
+      box-shadow: 0 28px 90px rgba(0, 0, 0, .38);
+    }
+    .app-chrome { overflow: hidden; border-radius: 19px; background: #0b1019; text-align: left; }
+    .app-topbar { display: flex; align-items: center; justify-content: space-between; height: 50px; padding: 0 17px; border-bottom: 1px solid var(--line); background: rgba(18, 25, 37, .85); }
+    .window-dots { display: flex; gap: 6px; }
+    .window-dots i { width: 8px; height: 8px; border-radius: 50%; background: #354153; }
+    .app-title { color: #aab7ca; font-size: 11px; font-weight: 640; letter-spacing: .04em; }
+    .app-live { display: inline-flex; align-items: center; gap: 6px; color: #adc6de; font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+    .app-live::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #a6d9ff; box-shadow: 0 0 11px #8ecfff; }
+    .app-body { display: grid; grid-template-columns: .96fr 1.04fr; min-height: 380px; }
+    .query-side { padding: 25px; border-right: 1px solid var(--line); }
+    .mini-kicker { color: #718198; font-size: 10px; font-weight: 750; letter-spacing: .14em; text-transform: uppercase; }
+    .query {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      margin-top: 15px;
+      padding: 14px;
+      border: 1px solid rgba(189, 217, 255, .15);
+      border-radius: 12px;
+      background: #0d141f;
+      color: #dce8f9;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .query-spark { flex: 0 0 auto; color: #a3d7ff; }
+    .plan { display: grid; gap: 9px; margin-top: 17px; }
+    .plan-row { display: flex; justify-content: space-between; gap: 15px; padding-bottom: 9px; border-bottom: 1px solid rgba(213, 227, 255, .07); font-size: 11px; }
+    .plan-row span:first-child { color: #78869a; }
+    .plan-row span:last-child { color: #d4e5fb; font-weight: 620; text-align: right; }
+    .analysis-note { margin-top: 20px; padding: 12px; border-left: 2px solid #8cbcf5; border-radius: 0 8px 8px 0; background: rgba(104, 154, 218, .07); color: #a9b9cd; font-size: 11px; line-height: 1.55; }
+    .map-side { position: relative; display: flex; flex-direction: column; justify-content: space-between; min-height: 380px; padding: 25px; overflow: hidden; }
+    .polar-map {
+      position: absolute;
+      inset: 64px 14px 17px;
+      overflow: hidden;
+      border: 1px solid rgba(190, 221, 255, .13);
+      border-radius: 14px;
+      background:
+        radial-gradient(circle at 51% 48%, rgba(159, 207, 255, .46) 0 7%, rgba(87, 138, 207, .25) 7.3% 15%, transparent 15.4%),
+        radial-gradient(circle at 51% 48%, transparent 0 24%, rgba(191, 222, 255, .10) 24.3% 24.8%, transparent 25.1% 38%, rgba(191, 222, 255, .08) 38.3% 38.8%, transparent 39.1% 53%, rgba(191, 222, 255, .08) 53.3% 53.8%, transparent 54.1%),
+        repeating-conic-gradient(from -10deg at 51% 48%, rgba(182, 221, 255, .075) 0 1deg, transparent 1deg 30deg),
+        linear-gradient(135deg, #0d2033, #111a2c 45%, #162035);
+    }
+    .polar-map::before, .polar-map::after { content: ""; position: absolute; border-radius: 50%; pointer-events: none; }
+    .polar-map::before { width: 48%; height: 13%; top: 17%; left: 18%; border: 1px solid rgba(177, 222, 255, .38); transform: rotate(-18deg); box-shadow: 38px 63px 0 -4px rgba(160, 207, 255, .18), 83px 119px 0 -8px rgba(160, 207, 255, .23); }
+    .polar-map::after { width: 26%; height: 9%; right: 14%; bottom: 20%; border: 1px solid rgba(202, 193, 255, .36); transform: rotate(24deg); }
+    .map-head { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: center; }
+    .map-head strong { font-size: 12px; letter-spacing: -.01em; }
+    .map-head span { color: #86a0ba; font-size: 10px; font-weight: 620; }
+    .map-caption { position: relative; z-index: 1; display: flex; justify-content: space-between; color: #9eafc4; font-size: 10px; }
+    .map-legend { display: flex; gap: 4px; align-items: center; }
+    .map-legend i { width: 14px; height: 5px; border-radius: 4px; background: linear-gradient(90deg, #57639a, #9cc4f4, #e0efff); }
+
+    /* Sections */
+    .section { padding: 106px 0; border-top: 1px solid rgba(213, 227, 255, .08); }
+    .section-head { max-width: 670px; margin: 0 auto 45px; text-align: center; }
+    .section-label { color: #9ccdf7; font-size: 11px; font-weight: 750; letter-spacing: .17em; text-transform: uppercase; }
+    .section h2 { margin: 11px 0 0; color: #f7faff; font-size: clamp(29px, 4vw, 43px); font-weight: 720; letter-spacing: -.05em; line-height: 1.07; }
+    .section-intro { margin: 15px auto 0; color: var(--muted); font-size: 16px; line-height: 1.65; }
+    .capabilities { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+    .capability {
+      min-height: 250px;
+      padding: 25px;
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      background: linear-gradient(145deg, rgba(24, 31, 45, .76), rgba(13, 18, 28, .66));
+      transition: transform .22s ease, border-color .22s ease;
+    }
+    .capability:hover { transform: translateY(-4px); border-color: rgba(189, 230, 255, .27); }
+    .icon-box { display: grid; width: 39px; height: 39px; place-items: center; border: 1px solid rgba(191, 224, 255, .16); border-radius: 11px; color: #cce5ff; background: rgba(133, 174, 230, .09); }
+    .icon-box svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    .capability h3 { margin: 22px 0 8px; color: #f4f8ff; font-size: 17px; letter-spacing: -.025em; }
+    .capability p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.62; }
+    .capability .tag { display: inline-block; margin-top: 18px; color: #9bb1cc; font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+
+    .workflow { display: grid; grid-template-columns: 1fr 1.35fr; gap: 76px; align-items: start; }
+    .workflow .section-head { margin: 0; text-align: left; }
+    .workflow .section-intro { margin-left: 0; }
+    .steps { display: grid; gap: 12px; }
+    .step { display: grid; grid-template-columns: 48px 1fr; gap: 17px; padding: 20px; border: 1px solid var(--line); border-radius: 14px; background: rgba(17, 23, 34, .5); }
+    .step-number { color: #a7d7ff; font-size: 12px; font-weight: 750; letter-spacing: .08em; }
+    .step h3 { margin: 0 0 6px; font-size: 16px; letter-spacing: -.02em; }
+    .step p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.58; }
+    .truth-strip { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; margin-top: 64px; overflow: hidden; border: 1px solid var(--line); border-radius: 16px; background: var(--line); }
+    .truth-strip > div { padding: 27px 30px; background: #0b111b; }
+    .truth-strip strong { display: block; color: #e9f3ff; font-size: 15px; letter-spacing: -.02em; }
+    .truth-strip p { margin: 7px 0 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
+
+    .tellus-note {
+      position: relative;
+      overflow: hidden;
+      padding: 54px;
+      border: 1px solid rgba(185, 213, 255, .18);
+      border-radius: 20px;
+      background: linear-gradient(125deg, rgba(30, 47, 70, .58), rgba(17, 22, 36, .86) 50%, rgba(56, 40, 88, .46));
+      text-align: center;
+    }
+    .tellus-note::after { content: ""; position: absolute; width: 430px; height: 430px; top: -260px; right: -100px; border: 1px solid rgba(193, 221, 255, .12); border-radius: 50%; box-shadow: 0 0 0 50px rgba(193, 221, 255, .025), 0 0 0 100px rgba(193, 221, 255, .018); }
+    .tellus-note > * { position: relative; z-index: 1; }
+    .tellus-note .brand { justify-content: center; }
+    .tellus-note h2 { max-width: 680px; margin: 20px auto 0; color: #f6faff; font-size: clamp(28px, 4vw, 42px); font-weight: 710; letter-spacing: -.055em; line-height: 1.1; }
+    .tellus-note p { max-width: 630px; margin: 16px auto 0; color: #b5c3d6; font-size: 15px; line-height: 1.7; }
+
+    /* Waitlist */
+    .waitlist-section { padding: 108px 0; text-align: center; }
+    .waitlist-panel {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 54px 36px;
+      border: 1px solid rgba(201, 225, 255, .17);
+      border-radius: 20px;
+      background: linear-gradient(145deg, rgba(29, 41, 60, .74), rgba(13, 18, 27, .84));
+      box-shadow: 0 25px 70px rgba(0, 0, 0, .16);
+    }
+    .waitlist-panel h2 { margin: 12px 0 0; font-size: clamp(29px, 4vw, 40px); letter-spacing: -.055em; }
+    .waitlist-panel p { max-width: 540px; margin: 14px auto 0; color: var(--muted); font-size: 15px; line-height: 1.65; }
+    .waitlist-form { display: flex; gap: 10px; max-width: 510px; margin: 27px auto 0; }
+    .waitlist-form input {
+      min-width: 0;
+      flex: 1;
+      height: 48px;
+      padding: 0 15px;
+      outline: none;
+      border: 1px solid rgba(205, 225, 255, .16);
+      border-radius: 11px;
+      color: white;
+      background: rgba(5, 9, 15, .48);
+      font-size: 13px;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .waitlist-form input::placeholder { color: #68768a; }
+    .waitlist-form input:focus { border-color: rgba(169, 211, 255, .62); box-shadow: 0 0 0 3px rgba(126, 182, 239, .11); }
+    .form-status { min-height: 18px; margin: 12px 0 0; color: var(--quiet); font-size: 12px; }
+    .form-status.success { color: var(--success); }
+    .form-status.error { color: var(--danger); }
+
+    footer { border-top: 1px solid rgba(213, 227, 255, .08); }
+    .footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 18px; min-height: 84px; color: #6f7d90; font-size: 11px; }
+    .footer-inner strong { color: #afc0d7; font-weight: 650; }
+
+    @media (max-width: 800px) {
+      .nav-links { display: none; }
+      .hero { padding: 76px 0 62px; }
+      .hero-copy { font-size: 16px; }
+      .app-body { grid-template-columns: 1fr; }
+      .query-side { border-right: 0; border-bottom: 1px solid var(--line); }
+      .map-side { min-height: 320px; }
+      .capabilities { grid-template-columns: 1fr; }
+      .workflow { grid-template-columns: 1fr; gap: 38px; }
+      .truth-strip { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 540px) {
+      .container { width: min(100% - 28px, 1160px); }
+      nav { min-height: 64px; }
+      .brand-polaris { font-size: 15px; }
+      .brand-tellus { font-size: 9px; }
+      .button-small { padding: 0 10px; }
+      .hero { padding-top: 61px; }
+      .app-shell { margin-top: 55px; }
+      .query-side, .map-side { padding: 18px; }
+      .app-topbar { padding: 0 12px; }
+      .app-title { font-size: 9px; }
+      .map-side { min-height: 280px; }
+      .section { padding: 76px 0; }
+      .tellus-note { padding: 38px 23px; }
+      .waitlist-panel { padding: 42px 21px; }
+      .waitlist-form { flex-direction: column; }
+      .waitlist-form .button { width: 100%; }
+      .footer-inner { flex-direction: column; justify-content: center; padding: 19px 0; text-align: center; }
+    }
+  </style>
 </head>
-<body class="bg-neutral-950 text-neutral-100 font-sans antialiased selection:bg-neutral-200 selection:text-neutral-950">
+<body>
+  <div class="grid-backdrop" aria-hidden="true"></div>
 
-    <!-- 1. SPLASH SCREEN (ZOOMING LOGO OVERLAY) -->
-    <div id="splash-screen" class="fixed inset-0 z-[100] bg-neutral-950 flex flex-col items-center justify-center transition-opacity duration-700 pointer-events-auto">
-        <div class="text-center animate-zoom-intro px-4">
-            <h1 class="text-6xl md:text-9xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white via-neutral-200 to-neutral-600 uppercase">
-                TELLUS
-            </h1>
-            <p class="text-neutral-500 text-xs md:text-sm tracking-[0.35em] font-mono uppercase mt-3">Satellite Cryosphere Intelligence</p>
-        </div>
+  <div id="splash" aria-hidden="true">
+    <div class="splash-inner">
+      <p class="splash-tellus">Tellus</p>
+      <p class="splash-polaris">Polaris</p>
+      <p class="splash-caption">Polar Earth Observation</p>
     </div>
+  </div>
 
-    <!-- 2. HEADER NAVIGATION -->
-    <nav class="border-b border-neutral-800/80 bg-neutral-950/80 backdrop-blur sticky top-0 z-50">
-        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <span class="text-lg">❄️</span>
-                <span class="text-xl font-bold tracking-tight text-white uppercase">Tellus <span class="text-neutral-500 font-normal">Polaris</span></span>
-            </div>
-            <div class="flex items-center space-x-6 text-sm text-neutral-400">
-                <a href="#features" class="hover:text-white transition">Features</a>
-                <a href="#early-access" class="hover:text-white transition">Early Access</a>
-                <a href="https://tellus-cryo.streamlit.app/#tellus-cryo" target="_blank" rel="noopener noreferrer" class="bg-neutral-100 hover:bg-neutral-300 text-neutral-950 font-semibold px-4 py-2 rounded-lg text-sm transition">Launch App</a>
-            </div>
-        </div>
+  <header class="nav-wrap">
+    <nav class="container" aria-label="Primary navigation">
+      <a class="brand" href="#" aria-label="Polaris by Tellus home">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-name">
+          <span class="brand-tellus">TELLUS</span>
+          <span class="brand-polaris">Polaris</span>
+        </span>
+      </a>
+      <div class="nav-links">
+        <a href="#capabilities">Capabilities</a>
+        <a href="#workflow">Workflow</a>
+        <a href="#preview">Preview access</a>
+      </div>
+      <a class="button button-primary button-small" href="https://tellus-cryo.streamlit.app/#tellus-cryo" target="_blank" rel="noopener noreferrer">
+        Launch Polaris <span aria-hidden="true">↗</span>
+      </a>
     </nav>
+  </header>
 
-    <!-- 3. HERO SECTION -->
-    <section class="max-w-5xl mx-auto px-6 pt-24 pb-20 text-center">
-        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-neutral-800 bg-neutral-900/80 text-neutral-300 text-xs font-semibold uppercase tracking-wider mb-8">
-            <span class="w-2 h-2 rounded-full bg-neutral-300 animate-pulse"></span>
-            NASA ICESat-2 (ATL20) AI Assistant
-        </div>
-        
-        <h1 class="text-4xl md:text-6xl font-extrabold text-white tracking-tight leading-tight mb-6">
-            Conversational Satellite Analytics for <br class="hidden sm:inline" />
-            <span class="bg-gradient-to-r from-white via-neutral-300 to-neutral-500 bg-clip-text text-transparent">Polar Climate Science</span>
-        </h1>
-        
-        <p class="text-lg md:text-xl text-neutral-400 max-w-3xl mx-auto mb-10 leading-relaxed font-light">
-            Ask questions, not code. Instantly explore NASA ICESat-2 sea ice freeboard data with spatial maps, time-series visualizations, and AI-powered scientific commentary.
-        </p>
+  <main>
+    <section class="hero container">
+      <div class="eyebrow"><span class="pulse" aria-hidden="true"></span> Polaris by Tellus</div>
+      <div class="product-lockup" aria-label="Polaris by Tellus">
+        <small>by Tellus</small>
+        <strong>POLARIS</strong>
+      </div>
+      <h1>The AI workspace for <em>polar Earth observation.</em></h1>
+      <p class="hero-copy">Move from a research question to transparent satellite analysis—without starting from a blank script. Polaris begins with NASA ICESat-2 sea-ice freeboard data.</p>
+      <div class="hero-actions">
+        <a class="button button-primary" href="https://tellus-cryo.streamlit.app/#tellus-cryo" target="_blank" rel="noopener noreferrer">Launch Polaris <span aria-hidden="true">↗</span></a>
+        <a class="button button-quiet" href="#preview">Request preview</a>
+      </div>
+      <div class="availability"><span aria-hidden="true"></span> Currently supporting NASA ICESat-2 ATL20</div>
 
-        <div class="flex items-center justify-center mb-20">
-            <a href="https://tellus-cryo.streamlit.app/#tellus-cryo" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto px-8 py-3.5 bg-neutral-100 hover:bg-white text-neutral-950 font-bold rounded-xl shadow-lg transition text-center">Launch Tellus Polaris</a>
-        </div>
-
-        <!-- Simulated App Preview Box -->
-        <div class="bg-neutral-900/90 border border-neutral-800 rounded-2xl p-4 sm:p-6 shadow-2xl text-left max-w-4xl mx-auto">
-            <!-- Simulated Input Bar -->
-            <div class="flex items-center gap-3 bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 mb-6">
-                <i class="fas fa-terminal text-neutral-400"></i>
-                <span class="text-neutral-300 text-sm font-mono flex-1">"Show me the 2020-2024 sea ice freeboard anomaly in the Weddell Sea."</span>
-                <span class="bg-neutral-800 text-neutral-300 text-xs px-2.5 py-1 rounded-md font-mono border border-neutral-700">Qwen 2.5 Parsed</span>
+      <div class="app-shell" aria-label="Polaris product preview">
+        <div class="app-chrome">
+          <div class="app-topbar">
+            <div class="window-dots" aria-hidden="true"><i></i><i></i><i></i></div>
+            <span class="app-title">POLARIS / ANALYSIS WORKSPACE</span>
+            <span class="app-live">ATL20 ready</span>
+          </div>
+          <div class="app-body">
+            <div class="query-side">
+              <div class="mini-kicker">Research question</div>
+              <div class="query"><span class="query-spark" aria-hidden="true">✦</span><span>“Show the 2020–2024 sea-ice freeboard anomaly in the Weddell Sea.”</span></div>
+              <div class="plan" aria-label="Structured analysis plan">
+                <div class="plan-row"><span>Dataset</span><span>ICESat-2 ATL20</span></div>
+                <div class="plan-row"><span>Region</span><span>Weddell Sea</span></div>
+                <div class="plan-row"><span>Period</span><span>2020–2024</span></div>
+                <div class="plan-row"><span>Analysis</span><span>Freeboard anomaly</span></div>
+              </div>
+              <div class="analysis-note">Structured requests keep the workflow inspectable: your question, selected parameters, data product, and output stay visible together.</div>
             </div>
-
-            <!-- Simulated Results Area -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Data Metrics Panel -->
-                <div class="bg-neutral-950/80 p-4 rounded-xl border border-neutral-800 text-sm space-y-3">
-                    <h4 class="text-neutral-500 text-xs uppercase font-bold tracking-wider">Computed Metrics</h4>
-                    <div class="flex justify-between"><span class="text-neutral-400">Mean Freeboard:</span> <span class="font-mono text-white">0.284 m</span></div>
-                    <div class="flex justify-between"><span class="text-neutral-400">Max Peak:</span> <span class="font-mono text-white">1.120 m</span></div>
-                    <div class="flex justify-between"><span class="text-neutral-400">Std Deviation:</span> <span class="font-mono text-white">0.089 m</span></div>
-                    <div class="pt-2 border-t border-neutral-800/80 text-xs text-neutral-500">
-                        Projection: <span class="text-neutral-300">EPSG:3031 (Antarctic)</span>
-                    </div>
-                </div>
-
-                <!-- AI Commentary Mock -->
-                <div class="md:col-span-2 bg-neutral-950/80 p-4 rounded-xl border border-neutral-800 text-sm">
-                    <h4 class="text-neutral-300 text-xs uppercase font-bold tracking-wider mb-2 flex items-center gap-2">
-                        <i class="fas fa-brain text-neutral-400"></i> Cryosphere AI Commentary
-                    </h4>
-                    <ul class="text-neutral-300 text-xs space-y-2 list-disc list-inside font-light">
-                        <li>Freeboard distribution shows a <strong class="text-white font-semibold">+0.04m positive anomaly</strong> along the western Weddell Sea edge.</li>
-                        <li>Indicates potential multi-year ice accumulation driven by strong atmospheric ridge positioning.</li>
-                        <li>Values align with satellite altimetry baseline trends from NASA ICESat-2 ATL20 granules.</li>
-                    </ul>
-                </div>
+            <div class="map-side">
+              <div class="map-head"><strong>Antarctic freeboard anomaly</strong><span>EPSG:3031</span></div>
+              <div class="polar-map" aria-hidden="true"></div>
+              <div class="map-caption"><span>Mean anomaly · 2020–2024</span><span class="map-legend"><i aria-hidden="true"></i> lower → higher</span></div>
             </div>
+          </div>
         </div>
+      </div>
     </section>
 
-    <!-- 4. FEATURES SECTION -->
-    <section id="features" class="py-24 border-t border-neutral-900 bg-neutral-950">
-        <div class="max-w-6xl mx-auto px-6">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl font-bold text-white mb-4">Built for Serious Geospatial Workflows</h2>
-                <p class="text-neutral-400 max-w-2xl mx-auto font-light">Tellus Polaris replaces hours of data preprocessing script writing with direct, verified satellite analytics.</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Feature 1 -->
-                <div class="bg-neutral-900/50 border border-neutral-800 p-6 rounded-2xl hover:border-neutral-700 transition">
-                    <div class="w-12 h-12 rounded-xl bg-neutral-800 text-neutral-200 flex items-center justify-center text-xl mb-4 border border-neutral-700/50">
-                        <i class="fas fa-satellite"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-white mb-2">Direct NASA Integration</h3>
-                    <p class="text-neutral-400 text-sm leading-relaxed font-light">Pulls verified ICESat-2 (ATL20) grid granules directly using NASA Earthdata authentication with disk-cached performance.</p>
-                </div>
-
-                <!-- Feature 2 -->
-                <div class="bg-neutral-900/50 border border-neutral-800 p-6 rounded-2xl hover:border-neutral-700 transition">
-                    <div class="w-12 h-12 rounded-xl bg-neutral-800 text-neutral-200 flex items-center justify-center text-xl mb-4 border border-neutral-700/50">
-                        <i class="fas fa-globe-americas"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-white mb-2">Polar Stereographic Projections</h3>
-                    <p class="text-neutral-400 text-sm leading-relaxed font-light">Native Cartopy rendering for EPSG:3031 (Antarctic) and EPSG:3413 (Arctic) projections without longitude distortion.</p>
-                </div>
-
-                <!-- Feature 3 -->
-                <div class="bg-neutral-900/50 border border-neutral-800 p-6 rounded-2xl hover:border-neutral-700 transition">
-                    <div class="w-12 h-12 rounded-xl bg-neutral-800 text-neutral-200 flex items-center justify-center text-xl mb-4 border border-neutral-700/50">
-                        <i class="fas fa-robot"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-white mb-2">Deterministic AI Parser</h3>
-                    <p class="text-neutral-400 text-sm leading-relaxed font-light">Natural language parameters are extracted deterministically via Qwen 2.5—ensuring math and maps come purely from raw data.</p>
-                </div>
-            </div>
+    <section id="capabilities" class="section">
+      <div class="container">
+        <div class="section-head">
+          <div class="section-label">Built for the scientific workflow</div>
+          <h2>Ask questions. Keep the evidence in view.</h2>
+          <p class="section-intro">Polaris is designed to remove repetitive setup work while preserving the data choices and analysis context researchers need to examine.</p>
         </div>
+        <div class="capabilities">
+          <article class="capability">
+            <div class="icon-box" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M5 19.5 8.7 12l2.7 3.4L15.3 7l3.7 12.5"/><path d="M4 19.5h16"/></svg>
+            </div>
+            <h3>Explore through language</h3>
+            <p>Describe a region, time range, metric, or comparison in plain language. Polaris turns the request into a structured analysis plan.</p>
+            <span class="tag">Question → plan</span>
+          </article>
+          <article class="capability">
+            <div class="icon-box" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 4v16M4 12h16M6.3 6.3c3.1 2.2 8.3 2.2 11.4 0M6.3 17.7c3.1-2.2 8.3-2.2 11.4 0"/></svg>
+            </div>
+            <h3>Native to polar data</h3>
+            <p>Work in Arctic and Antarctic polar stereographic projections, with spatial maps and time-series views suited to cryosphere research.</p>
+            <span class="tag">Polar-first rendering</span>
+          </article>
+          <article class="capability">
+            <div class="icon-box" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M4 18V6"/><path d="M4 18h16"/><path d="m7 15 3.2-4 3 2.1L18 8"/><circle cx="7" cy="15" r="1"/><circle cx="10.2" cy="11" r="1"/><circle cx="13.2" cy="13.1" r="1"/><circle cx="18" cy="8" r="1"/></svg>
+            </div>
+            <h3>Data-driven outputs</h3>
+            <p>Generate maps, time-series views, and computed summary statistics from the selected data product—rather than from a text model.</p>
+            <span class="tag">Raw data → result</span>
+          </article>
+        </div>
+      </div>
     </section>
 
-    <!-- 5. EARLY ACCESS FORM -->
-    <section id="early-access" class="py-24 border-t border-neutral-900 bg-neutral-900/30">
-        <div class="max-w-3xl mx-auto px-6 text-center">
-            <h2 class="text-3xl font-bold text-white mb-4">Join the Pre-Launch Preview</h2>
-            <p class="text-neutral-400 mb-8 font-light">Are you a cryosphere researcher, PhD candidate, or GIS analyst? Get early access to test the live prototype.</p>
-
-            <form id="waitlist-form" class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-                <input type="email" id="user-email" required placeholder="Enter your academic / lab email" class="bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3 text-neutral-200 text-sm focus:outline-none focus:border-neutral-500 flex-1">
-                <button type="submit" id="submit-btn" class="bg-neutral-100 hover:bg-white text-neutral-950 font-bold px-6 py-3 rounded-xl text-sm transition">
-                    Request Preview
-                </button>
-            </form>
-
-            <p id="form-status" class="text-xs text-neutral-500 mt-3">Zero spam. Purely for research feedback and preview links.</p>
+    <section id="workflow" class="section">
+      <div class="container">
+        <div class="workflow">
+          <div class="section-head">
+            <div class="section-label">A clearer path to analysis</div>
+            <h2>From intent to output, without hiding the middle.</h2>
+            <p class="section-intro">Polaris is not a black-box answer engine. It gives researchers a faster starting point while making each analytical choice legible.</p>
+          </div>
+          <div class="steps">
+            <article class="step">
+              <div class="step-number">01</div>
+              <div><h3>State the research question</h3><p>Ask for a map, statistic, time-series, or anomaly using the scientific language you already use.</p></div>
+            </article>
+            <article class="step">
+              <div class="step-number">02</div>
+              <div><h3>Review the parsed request</h3><p>See the dataset, area, period, variable, and requested analysis before the workflow runs.</p></div>
+            </article>
+            <article class="step">
+              <div class="step-number">03</div>
+              <div><h3>Inspect results from the data</h3><p>Explore the resulting visualizations and metrics, grounded in the corresponding satellite product and projection.</p></div>
+            </article>
+          </div>
         </div>
+        <div class="truth-strip">
+          <div><strong>Current scope</strong><p>Polaris is an early prototype focused on NASA ICESat-2 ATL20 sea-ice freeboard workflows.</p></div>
+          <div><strong>Where Tellus is headed</strong><p>A family of transparent, domain-specific workspaces for Earth observation—starting at the poles.</p></div>
+        </div>
+      </div>
     </section>
 
-    <!-- 6. FOOTER -->
-    <footer class="border-t border-neutral-900 py-8 text-center text-xs text-neutral-500">
-        <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div>
-                © 2026 Tellus Polaris
-            </div>
-            <div>
-                Powered by NASA Earthdata (ATL20 Granules)
-            </div>
+    <section class="section">
+      <div class="container">
+        <div class="tellus-note">
+          <div class="brand" aria-label="Tellus">
+            <span class="brand-mark" aria-hidden="true"></span>
+            <span class="brand-tellus">TELLUS</span>
+          </div>
+          <h2>Polaris is the first workspace from Tellus.</h2>
+          <p>Tellus is building a more natural interface to Earth observation: tools that help scientists move from a question to a rigorous, inspectable workflow across complex geospatial data.</p>
         </div>
-    </footer>
+      </div>
+    </section>
 
-    <!-- JavaScript: Waitlist Form & Splash Screen Handler -->
-    <script>
-        // Handle Splash Screen Removal
-        window.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                const splash = document.getElementById('splash-screen');
-                splash.classList.add('opacity-0', 'pointer-events-none');
-                setTimeout(() => splash.remove(), 700); // Cleanly removes from DOM
-            }, 1800);
-        });
+    <section id="preview" class="waitlist-section">
+      <div class="container">
+        <div class="waitlist-panel">
+          <div class="section-label">Early research preview</div>
+          <h2>Help shape Polaris.</h2>
+          <p>Are you a cryosphere researcher, PhD candidate, or GIS analyst? Join the preview list to test the live prototype and share research-grounded feedback.</p>
+          <form id="waitlist-form" class="waitlist-form" novalidate>
+            <label class="sr-only" for="email">Academic or lab email</label>
+            <input id="email" name="email" type="email" autocomplete="email" placeholder="Academic or lab email" required>
+            <button id="submit-button" class="button button-primary" type="submit">Request preview</button>
+          </form>
+          <p id="form-status" class="form-status" aria-live="polite">No spam—only product updates and research-preview invitations.</p>
+        </div>
+      </div>
+    </section>
+  </main>
 
-        // FormSubmit AJAX Script
-        document.getElementById('waitlist-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const emailInput = document.getElementById('user-email');
-            const submitBtn = document.getElementById('submit-btn');
-            const statusText = document.getElementById('form-status');
-            
-            const userEmail = emailInput.value;
-            submitBtn.disabled = true;
-            submitBtn.innerText = "Submitting...";
+  <footer>
+    <div class="container footer-inner">
+      <div><strong>Polaris</strong> by Tellus · © 2026 Tellus</div>
+      <div>Built around NASA Earthdata · ICESat-2 ATL20</div>
+    </div>
+  </footer>
 
-            try {
-                const response = await fetch("https://formsubmit.co/ajax/rpmenon02@gmail.com", {
-                    method: "POST",
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        email: userEmail,
-                        _subject: "🚀 New Tellus Polaris Waitlist Submission!"
-                    })
-                });
+  <script>
+    window.addEventListener("load", function () {
+      window.setTimeout(function () {
+        document.getElementById("splash").classList.add("is-hidden");
+      }, 1450);
+    });
 
-                if (response.ok) {
-                    statusText.className = "text-xs text-emerald-400 mt-3 font-semibold";
-                    statusText.innerText = "🎉 You're on the preview list! We will reach out soon.";
-                    emailInput.value = "";
-                    submitBtn.innerText = "Joined!";
-                } else {
-                    throw new Error("Submission failed");
-                }
-            } catch (error) {
-                statusText.className = "text-xs text-rose-400 mt-3";
-                statusText.innerText = "⚠️ Submission failed. Please try again or refresh.";
-                submitBtn.disabled = false;
-                submitBtn.innerText = "Request Preview";
-            }
-        });
-    </script>
+    (function () {
+      var form = document.getElementById("waitlist-form");
+      var email = document.getElementById("email");
+      var button = document.getElementById("submit-button");
+      var status = document.getElementById("form-status");
 
+      form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        if (!email.checkValidity()) {
+          status.className = "form-status error";
+          status.textContent = "Please enter a valid email address.";
+          email.focus();
+          return;
+        }
+
+        button.disabled = true;
+        button.textContent = "Submitting…";
+        status.className = "form-status";
+        status.textContent = "Adding you to the preview list…";
+
+        try {
+          var response = await fetch("https://formsubmit.co/ajax/rpmenon02@gmail.com", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "application/json"
+            },
+            body: JSON.stringify({
+              email: email.value,
+              _subject: "New Polaris by Tellus preview request",
+              _template: "table"
+            })
+          });
+
+          if (!response.ok) throw new Error("Preview request failed");
+
+          form.reset();
+          button.textContent = "Request received";
+          status.className = "form-status success";
+          status.textContent = "You’re on the preview list. We’ll be in touch.";
+        } catch (error) {
+          button.disabled = false;
+          button.textContent = "Request preview";
+          status.className = "form-status error";
+          status.textContent = "We couldn’t submit your request. Please try again shortly.";
+        }
+      });
+    }());
+  </script>
 </body>
 </html>
